@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Inversiones</title>
-    
+
     <!-- 1. Carga de librerías (ORDEN IMPORTANTE) -->
     <!-- Estilos -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- React Core -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    
-    <!-- Dependencias de Recharts (Esta faltaba y causaba el error) -->
+
+    <!-- Dependencias de Recharts -->
     <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
-    
+
     <!-- Librería de Gráficos -->
     <script src="https://unpkg.com/recharts@2.12.0/umd/Recharts.js"></script>
-    
+
     <!-- Compilador de código (Babel) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
@@ -26,6 +26,7 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     </style>
 </head>
+
 <body class="bg-slate-50">
     <div id="root"></div>
 
@@ -33,7 +34,7 @@
     <script type="text/babel">
         // --- CONFIGURACIÓN ---
         // Pega aquí tu URL de Google Sheets publicada como CSV
-        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT2q5B__AcuBzjLoDUJPIrR0yyOa4BTcGuZjOMoJv9j55LsBTcKfFmai5qwkqAjsw/pub?gid=1204167854&single=true&output=csv"; 
+        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT2q5B__AcuBzjLoDUJPIrR0yyOa4BTcGuZjOMoJv9j55LsBTcKfFmai5qwkqAjsw/pub?gid=1204167854&single=true&output=csv";
 
         // Datos de respaldo por si falla la conexión
         const DEMO_CSV = `Moneda,Fecha,Cuenta,Unidad,Importe,FCI
@@ -51,9 +52,9 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
 
         // --- IMPORTACIONES ---
         const { useState, useEffect, useMemo } = React;
-        const { 
-            BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip: RechartsTooltip, Legend, ResponsiveContainer, 
-            PieChart, Pie, Cell, AreaChart, Area 
+        const {
+            BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip: RechartsTooltip, Legend, ResponsiveContainer,
+            PieChart, Pie, Cell, AreaChart, Area
         } = Recharts;
 
         // --- ICONOS SVG ---
@@ -86,48 +87,75 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
             </div>
         );
 
-        const StatCard = ({ title, value, subtext, icon: Icon }) => (
-            <Card className="p-6">
-                <div className="flex items-center justify-between mb-4">
+        const StatCard = ({ title, value, subtext, icon: IconComp }) => (
+            <Card className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
                     <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                        <Icon size={24} />
+                        <IconComp size={24} />
                     </div>
                 </div>
-                <h3 className="text-slate-500 text-sm font-medium uppercase tracking-wider">{title}</h3>
-                <div className="mt-2 text-2xl font-bold text-slate-800 truncate" title={typeof value === 'string' ? value : ''}>{value}</div>
+                <h3 className="text-slate-500 text-xs sm:text-sm font-medium uppercase tracking-wider">{title}</h3>
+                <div className="mt-2 text-xl sm:text-2xl font-bold text-slate-800 truncate" title={typeof value === 'string' ? value : ''}>{value}</div>
                 {subtext && <p className="mt-1 text-xs text-slate-400 truncate">{subtext}</p>}
             </Card>
         );
 
         const FilterBar = ({ title, currencies, managers, currencyVal, setCurrency, managerVal, setManager, startDate, setStartDate, endDate, setEndDate }) => (
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row flex-wrap gap-4 items-end md:items-center mb-6">
-                <div className="flex items-center gap-2 text-slate-800 font-semibold mr-4 w-full md:w-auto border-b md:border-b-0 pb-2 md:pb-0">
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end md:items-center mb-6">
+                <div className="flex items-center gap-2 text-slate-800 font-semibold mr-0 sm:mr-4 w-full sm:w-auto border-b sm:border-b-0 pb-2 sm:pb-0">
                     <Icons.Filter size={18} className="text-blue-600" />
                     <span>{title}</span>
                 </div>
-                <div className="flex flex-col gap-1 w-full md:w-auto">
+
+                <div className="flex flex-col gap-1 w-full sm:w-auto">
                     <label className="text-[10px] text-slate-400 font-bold uppercase ml-1">Moneda</label>
-                    <select value={currencyVal} onChange={(e) => setCurrency(e.target.value)} className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none w-full">
+                    <select
+                        value={currencyVal}
+                        onChange={(e) => setCurrency(e.target.value)}
+                        className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none w-full"
+                    >
                         {currencies.map(c => <option key={c} value={c}>{c === 'TODAS' ? 'Todas' : c}</option>)}
                     </select>
                 </div>
-                <div className="flex flex-col gap-1 w-full md:w-auto">
+
+                <div className="flex flex-col gap-1 w-full sm:w-auto">
                     <label className="text-[10px] text-slate-400 font-bold uppercase ml-1">Administradora</label>
-                    <select value={managerVal} onChange={(e) => setManager(e.target.value)} className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none w-full md:w-48">
+                    <select
+                        value={managerVal}
+                        onChange={(e) => setManager(e.target.value)}
+                        className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none w-full sm:w-64 md:w-48"
+                    >
                         {managers.map(m => <option key={m} value={m}>{m === 'TODAS' ? 'Todas' : m}</option>)}
                     </select>
                 </div>
+
                 <div className="hidden md:block w-px h-8 bg-slate-200 mx-2"></div>
-                <div className="flex flex-col gap-1 w-full md:w-auto">
+
+                <div className="flex flex-col gap-1 w-full sm:w-auto">
                     <label className="text-[10px] text-slate-400 font-bold uppercase ml-1 flex items-center gap-1"><Icons.Calendar size={10}/> Desde</label>
-                    <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5 outline-none"/>
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none w-full sm:w-auto"
+                    />
                 </div>
-                <div className="flex flex-col gap-1 w-full md:w-auto">
+
+                <div className="flex flex-col gap-1 w-full sm:w-auto">
                     <label className="text-[10px] text-slate-400 font-bold uppercase ml-1 flex items-center gap-1"><Icons.Calendar size={10}/> Hasta</label>
-                    <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5 outline-none"/>
+                    <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none w-full sm:w-auto"
+                    />
                 </div>
+
                 {(startDate || endDate || currencyVal !== 'TODAS' || managerVal !== 'TODAS') && (
-                    <button onClick={() => { setStartDate(''); setEndDate(''); setCurrency('TODAS'); setManager('TODAS'); }} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 ml-auto md:ml-0">
+                    <button
+                        onClick={() => { setStartDate(''); setEndDate(''); setCurrency('TODAS'); setManager('TODAS'); }}
+                        className="text-xs text-red-500 hover:text-red-700 flex items-center justify-center gap-1 w-full sm:w-auto sm:ml-auto md:ml-0 border border-red-100 rounded-lg p-2 sm:p-0 sm:border-0"
+                    >
                         <Icons.RefreshCcw size={12}/> Reiniciar
                     </button>
                 )}
@@ -158,7 +186,7 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
             if (lines.length < 2) return [];
             const firstLine = lines[0];
             const separator = firstLine.includes(';') ? ';' : ',';
-            
+
             const splitLine = (line) => {
                 const result = [];
                 let current = '';
@@ -214,6 +242,7 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
             const [totalManager, setTotalManager] = useState('TODAS');
             const [totalStart, setTotalStart] = useState('');
             const [totalEnd, setTotalEnd] = useState('');
+
             const [evolCurrency, setEvolCurrency] = useState('TODAS');
             const [evolManager, setEvolManager] = useState('TODAS');
             const [evolStart, setEvolStart] = useState('');
@@ -302,7 +331,7 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
             }, [filteredTotalData]);
 
             const timelineData = useMemo(() => {
-                const monthMaxDates = {}; 
+                const monthMaxDates = {};
                 filteredEvolData.forEach(curr => {
                     const d = parseDateValue(curr.Fecha);
                     if (!d) return;
@@ -328,16 +357,34 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
             if (fetchError) return <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center"><Icons.ExternalLink className="text-red-500 mb-2" size={40}/><h2 className="font-bold text-slate-700">Error de Conexión</h2><p className="text-slate-500">{fetchError}</p></div>;
 
             return (
-                <div className="min-h-screen p-6 max-w-7xl mx-auto space-y-6">
-                    <header className="bg-white border-b border-slate-200 rounded-xl p-6 flex justify-between items-center shadow-sm">
+                <div className="min-h-screen p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
+                    <header className="bg-white border-b border-slate-200 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 shadow-sm">
                         <div className="flex items-center gap-3">
                             <div className="bg-blue-600 p-2 rounded-lg"><Icons.LayoutDashboard className="text-white" size={24} /></div>
-                            <div><h1 className="text-xl font-bold text-slate-800">Reporte de Cartera</h1><p className="text-xs text-slate-500">Datos en vivo</p></div>
+                            <div>
+                                <h1 className="text-lg sm:text-xl font-bold text-slate-800">Reporte de Cartera</h1>
+                                <p className="text-xs text-slate-500">Datos en vivo</p>
+                            </div>
                         </div>
                     </header>
 
-                    <div className="mt-4 mb-2 flex items-center gap-2 border-b border-slate-200 pb-2"><h2 className="text-lg font-bold text-slate-700">1. Totales y Ranking (Snapshot)</h2></div>
-                    <FilterBar title="Filtros Totales" currencies={currencies} managers={managers} currencyVal={totalCurrency} setCurrency={setTotalCurrency} managerVal={totalManager} setManager={setTotalManager} startDate={totalStart} setStartDate={setTotalStart} endDate={totalEnd} setEndDate={setTotalEnd}/>
+                    <div className="mt-4 mb-2 flex items-center gap-2 border-b border-slate-200 pb-2">
+                        <h2 className="text-base sm:text-lg font-bold text-slate-700">1. Totales y Ranking (Snapshot)</h2>
+                    </div>
+
+                    <FilterBar
+                        title="Filtros Totales"
+                        currencies={currencies}
+                        managers={managers}
+                        currencyVal={totalCurrency}
+                        setCurrency={setTotalCurrency}
+                        managerVal={totalManager}
+                        setManager={setTotalManager}
+                        startDate={totalStart}
+                        setStartDate={setTotalStart}
+                        endDate={totalEnd}
+                        setEndDate={setTotalEnd}
+                    />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <StatCard title="Total en ARS" value={formatCurrency(stats.totalImporteARS, 'ARS')} icon={Icons.Wallet} subtext="Suma filtrada" />
@@ -346,15 +393,28 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
                     </div>
 
                     <div className="grid grid-cols-1 mb-6">
-                        <Card className="p-6">
-                            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><Icons.PieChart size={20} className="text-blue-500" />Volumen por Familia (FCI)</h3>
-                            <div className="h-[350px] w-full">
+                        <Card className="p-4 sm:p-6">
+                            <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <Icons.PieChart size={20} className="text-blue-500" />
+                                Volumen por Familia (FCI)
+                            </h3>
+                            <div className="h-[280px] sm:h-[350px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={managerData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                    <BarChart data={managerData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                        <XAxis dataKey="name" tick={{fontSize: 11}} interval={0} angle={-15} textAnchor="end" height={60}/>
+                                        <XAxis
+                                            dataKey="name"
+                                            tick={{ fontSize: 11 }}
+                                            interval="preserveStartEnd"
+                                            angle={0}
+                                            textAnchor="middle"
+                                            height={40}
+                                        />
                                         <YAxis tickFormatter={(val) => formatCurrency(val, totalCurrency === 'USD' ? 'USD' : 'ARS', true)} />
-                                        <RechartsTooltip formatter={(value) => [formatCurrency(value, totalCurrency === 'USD' ? 'USD' : 'ARS'), 'Volumen Total']} contentStyle={{ borderRadius: '8px' }} />
+                                        <RechartsTooltip
+                                            formatter={(value) => [formatCurrency(value, totalCurrency === 'USD' ? 'USD' : 'ARS'), 'Volumen Total']}
+                                            contentStyle={{ borderRadius: '8px' }}
+                                        />
                                         <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={60}>
                                             {managerData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                                         </Bar>
@@ -365,15 +425,27 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-                        <Card className="p-6">
-                            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><Icons.Users size={20} className="text-purple-500" />Top 10 Clientes</h3>
-                            <div className="h-[400px] w-full">
+                        <Card className="p-4 sm:p-6">
+                            <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <Icons.Users size={20} className="text-purple-500" />
+                                Top 10 Clientes
+                            </h3>
+                            <div className="h-[320px] sm:h-[400px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={topClientsData} layout="vertical" margin={{ left: 5, right: 40, top: 10, bottom: 5 }}>
+                                    <BarChart data={topClientsData} layout="vertical" margin={{ left: 5, right: 10, top: 10, bottom: 5 }}>
                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                                         <XAxis type="number" hide />
-                                        <YAxis dataKey="name" type="category" width={140} tick={{fontSize: 11}} tickFormatter={(val) => val.length > 20 ? val.substring(0, 20) + '...' : val}/>
-                                        <RechartsTooltip formatter={(value) => [formatCurrency(value, totalCurrency === 'USD' ? 'USD' : 'ARS'), 'Posición Total']} contentStyle={{ borderRadius: '8px' }} />
+                                        <YAxis
+                                            dataKey="name"
+                                            type="category"
+                                            width={140}
+                                            tick={{ fontSize: 11 }}
+                                            tickFormatter={(val) => val.length > 20 ? val.substring(0, 20) + '...' : val}
+                                        />
+                                        <RechartsTooltip
+                                            formatter={(value) => [formatCurrency(value, totalCurrency === 'USD' ? 'USD' : 'ARS'), 'Posición Total']}
+                                            contentStyle={{ borderRadius: '8px' }}
+                                        />
                                         <Bar dataKey="value" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20}>
                                             {topClientsData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[(index + 4) % COLORS.length]} />)}
                                         </Bar>
@@ -381,15 +453,28 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
                                 </ResponsiveContainer>
                             </div>
                         </Card>
-                        <Card className="p-6">
-                            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><Icons.BarChart2 size={20} className="text-emerald-500" />Top 10 Fondos</h3>
-                            <div className="h-[400px] w-full">
+
+                        <Card className="p-4 sm:p-6">
+                            <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <Icons.BarChart2 size={20} className="text-emerald-500" />
+                                Top 10 Fondos
+                            </h3>
+                            <div className="h-[320px] sm:h-[400px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={topFundsData} layout="vertical" margin={{ left: 5, right: 40, top: 10, bottom: 5 }}>
+                                    <BarChart data={topFundsData} layout="vertical" margin={{ left: 5, right: 10, top: 10, bottom: 5 }}>
                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                                         <XAxis type="number" hide />
-                                        <YAxis dataKey="name" type="category" width={140} tick={{fontSize: 10}} tickFormatter={(val) => val.length > 20 ? val.substring(0, 20) + '...' : val}/>
-                                        <RechartsTooltip formatter={(value) => [formatCurrency(value, totalCurrency === 'USD' ? 'USD' : 'ARS'), 'Volumen']} contentStyle={{ borderRadius: '8px' }} />
+                                        <YAxis
+                                            dataKey="name"
+                                            type="category"
+                                            width={140}
+                                            tick={{ fontSize: 10 }}
+                                            tickFormatter={(val) => val.length > 20 ? val.substring(0, 20) + '...' : val}
+                                        />
+                                        <RechartsTooltip
+                                            formatter={(value) => [formatCurrency(value, totalCurrency === 'USD' ? 'USD' : 'ARS'), 'Volumen']}
+                                            contentStyle={{ borderRadius: '8px' }}
+                                        />
                                         <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20}>
                                             {topFundsData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />)}
                                         </Bar>
@@ -399,22 +484,52 @@ ARS,2025-03-05,"LOPEZ, Carlos",Balanz Ahorro,1500000.00,BALANZ`;
                         </Card>
                     </div>
 
-                    <div className="mt-8 mb-2 flex items-center gap-2 border-b border-slate-200 pb-2 pt-4"><h2 className="text-lg font-bold text-slate-700">2. Análisis de Evolución (Histórico)</h2></div>
-                    <FilterBar title="Filtros Evolución" currencies={currencies} managers={managers} currencyVal={evolCurrency} setCurrency={setEvolCurrency} managerVal={evolManager} setManager={setEvolManager} startDate={evolStart} setStartDate={setEvolStart} endDate={evolEnd} setEndDate={setEvolEnd}/>
+                    <div className="mt-8 mb-2 flex items-center gap-2 border-b border-slate-200 pb-2 pt-4">
+                        <h2 className="text-base sm:text-lg font-bold text-slate-700">2. Análisis de Evolución (Histórico)</h2>
+                    </div>
+
+                    <FilterBar
+                        title="Filtros Evolución"
+                        currencies={currencies}
+                        managers={managers}
+                        currencyVal={evolCurrency}
+                        setCurrency={setEvolCurrency}
+                        managerVal={evolManager}
+                        setManager={setEvolManager}
+                        startDate={evolStart}
+                        setStartDate={setEvolStart}
+                        endDate={evolEnd}
+                        setEndDate={setEvolEnd}
+                    />
+
                     <div className="grid grid-cols-1 gap-6">
-                        <Card className="p-6">
-                            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><Icons.TrendingUp size={20} className="text-purple-500" />Evolución Histórica (Cierre de Mes)</h3>
-                            <div className="h-80 w-full">
+                        <Card className="p-4 sm:p-6">
+                            <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <Icons.TrendingUp size={20} className="text-purple-500" />
+                                Evolución Histórica (Cierre de Mes)
+                            </h3>
+
+                            <div className="h-[260px] sm:h-80 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={timelineData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                    <AreaChart data={timelineData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                         <defs>
-                                            <linearGradient id="colorArs" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/><stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/></linearGradient>
-                                            <linearGradient id="colorUsd" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/><stop offset="95%" stopColor="#10b981" stopOpacity={0}/></linearGradient>
+                                            <linearGradient id="colorArs" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                            </linearGradient>
+                                            <linearGradient id="colorUsd" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                                                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                            </linearGradient>
                                         </defs>
+
                                         <XAxis dataKey="date" />
                                         <YAxis tickFormatter={(val) => formatCurrency(val, 'ARS', true)}/>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                        <RechartsTooltip formatter={(value, name) => [formatCurrency(value, name.includes('USD') ? 'USD' : 'ARS'), name]} contentStyle={{ borderRadius: '8px' }} />
+                                        <RechartsTooltip
+                                            formatter={(value, name) => [formatCurrency(value, name.includes('USD') ? 'USD' : 'ARS'), name]}
+                                            contentStyle={{ borderRadius: '8px' }}
+                                        />
                                         <Legend />
                                         <Area type="monotone" dataKey="ARS" name="Pesos (ARS)" stroke="#3b82f6" fillOpacity={1} fill="url(#colorArs)" />
                                         <Area type="monotone" dataKey="USD" name="Dólares (USD)" stroke="#10b981" fillOpacity={1} fill="url(#colorUsd)" />
