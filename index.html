@@ -494,7 +494,7 @@ ARS,2025-03-05,Cuenta A,Balanz Ahorro,1500000.00,BALANZ`;
                                         <tbody className="divide-y divide-slate-200 bg-white">
                                             {groupedVariations.map((family) => (
                                                 <React.Fragment key={family.name}>
-                                                    <tr className="bg-brand-navy group hover:bg-slate-800 cursor-pointer transition-colors border-b border-slate-200" onClick={() => toggleFamily(family.name)}>
+                                                    <tr className="bg-slate-900 cursor-pointer transition-colors border-b border-slate-200" onClick={() => toggleFamily(family.name)}>
                                                         <td className="px-4 sm:px-6 py-3 flex items-center gap-2 font-bold text-white">
                                                             {expandedFamilies.includes(family.name) ? <Icons.ChevronDown size={14} className="text-brand-gold"/> : <Icons.ChevronRight size={14} className="text-brand-gold"/>}
                                                             {family.name}
@@ -587,3 +587,4 @@ ARS,2025-03-05,Cuenta A,Balanz Ahorro,1500000.00,BALANZ`;
     </script>
 </body>
 </html>
+
